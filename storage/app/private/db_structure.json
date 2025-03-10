@@ -1,0 +1,1210 @@
+{
+  "schemas": {
+    "ref": {
+      "description": "Reference tables used for lookup values and categorization specific to BPKP (Badan Pengawasan Keuangan dan Pembangunan) of the Republic of Indonesia.",
+      "tables": {
+        "regions": {
+          "description": "Contains geographical regions for organizing administrative areas within Indonesia and other countries as required by BPKP.",
+          "columns": {
+            "region_id": {
+              "type": "serial",
+              "primary_key": true,
+              "description": "Unique identifier for each region."
+            },
+            "region_name": {
+              "type": "varchar(25)",
+              "description": "Name of the region, typically corresponding to Indonesian regions or international zones."
+            }
+          }
+        },
+        "countries": {
+          "description": "Contains information about countries, primarily used for BPKP’s administrative and operational regions.",
+          "columns": {
+            "id": {
+              "type": "integer",
+              "primary_key": true,
+              "description": "Unique identifier for each country."
+            },
+            "name": {
+              "type": "varchar(40)",
+              "description": "Country name, including the Republic of Indonesia and others for international coordination."
+            },
+            "region": {
+              "type": "integer",
+              "foreign_key": "ref.regions.region_id",
+              "description": "Reference to the geographical region this country belongs to."
+            },
+            "created_on": {
+              "type": "timestamp",
+              "default": "CURRENT_TIMESTAMP",
+              "description": "Timestamp when the record was created."
+            },
+            "updated_on": {
+              "type": "timestamp",
+              "description": "Timestamp when the record was last updated."
+            },
+            "code": {
+              "type": "varchar(2)",
+              "unique": true,
+              "description": "ISO country code, including the 'ID' code for Indonesia."
+            }
+          }
+        },
+        "provinces": {
+          "description": "Contains information about provinces within the Republic of Indonesia under BPKP’s jurisdiction.",
+          "columns": {
+            "id": {
+              "type": "serial",
+              "primary_key": true,
+              "description": "Unique identifier for each province."
+            },
+            "country": {
+              "type": "integer",
+              "foreign_key": "ref.countries.id",
+              "description": "Reference to the country this province belongs to."
+            },
+            "code": {
+              "type": "varchar(2)",
+              "unique": true,
+              "description": "Province code as recognized by Indonesian administrative standards."
+            },
+            "name": {
+              "type": "varchar(50)",
+              "description": "Name of the province within Indonesia."
+            }
+          }
+        },
+        "cities": {
+          "description": "Contains information about cities and municipalities within Indonesian provinces for BPKP administration.",
+          "columns": {
+            "id": {
+              "type": "integer",
+              "primary_key": true,
+              "description": "Unique identifier for each city or municipality."
+            },
+            "province": {
+              "type": "integer",
+              "foreign_key": "ref.provinces.id",
+              "description": "Reference to the province where the city is located."
+            },
+            "code": {
+              "type": "varchar(4)",
+              "unique": true,
+              "description": "City code used for administrative purposes in Indonesia."
+            },
+            "type": {
+              "type": "integer",
+              "description": "Type of city (e.g., 1: Kota, 2: Kabupaten, as classified under BPKP)."
+            },
+            "name": {
+              "type": "varchar(50)",
+              "description": "Name of the city or municipality."
+            }
+          }
+        },
+        "ranks": {
+          "description": "Contains information about employee ranks within BPKP's organizational structure.",
+          "columns": {
+            "id": {
+              "type": "integer",
+              "primary_key": true,
+              "description": "Unique identifier for each rank."
+            },
+            "code": {
+              "type": "varchar(5)",
+              "description": "Unique code representing the rank level."
+            },
+            "name": {
+              "type": "varchar(50)",
+              "description": "Name of the rank within the BPKP structure."
+            },
+            "min_salary": {
+              "type": "integer",
+              "description": "Minimum salary associated with this rank in Indonesian Rupiah (IDR)."
+            },
+            "max_salary": {
+              "type": "integer",
+              "description": "Maximum salary associated with this rank in Indonesian Rupiah (IDR)."
+            }
+          }
+        },
+        "echelons": {
+          "description": "Contains information about echelons representing organizational levels in BPKP.",
+          "columns": {
+            "id": {
+              "type": "serial",
+              "primary_key": true,
+              "description": "Unique identifier for each echelon."
+            },
+            "name": {
+              "type": "varchar(50)",
+              "description": "Name of the echelon level (e.g., 'Eselon I', 'Eselon II')."
+            },
+            "min_rank": {
+              "type": "integer",
+              "foreign_key": "ref.ranks.id",
+              "description": "Reference to the minimum rank required for this echelon."
+            },
+            "max_rank": {
+              "type": "integer",
+              "foreign_key": "ref.ranks.id",
+              "description": "Reference to the maximum rank allowed for this echelon."
+            },
+            "min_salary": {
+              "type": "integer",
+              "description": "Minimum salary associated with this echelon in Indonesian Rupiah (IDR)."
+            },
+            "max_salary": {
+              "type": "integer",
+              "description": "Maximum salary associated with this echelon in Indonesian Rupiah (IDR)."
+            },
+            "created_on": {
+              "type": "timestamp",
+              "default": "CURRENT_TIMESTAMP",
+              "description": "Timestamp when the record was created."
+            },
+            "updated_on": {
+              "type": "timestamp",
+              "description": "Timestamp when the record was last updated."
+            },
+            "code": {
+              "type": "varchar(5)",
+              "description": "Unique code representing the echelon level."
+            }
+          }
+        },
+        "offices": {
+          "description": "Contains information about BPKP offices and their administrative locations throughout Indonesia.",
+          "columns": {
+            "id": {
+              "type": "serial",
+              "primary_key": true,
+              "description": "Unique identifier for each BPKP office."
+            },
+            "name": {
+              "type": "varchar(100)",
+              "description": "Name of the BPKP office or regional representative."
+            },
+            "address": {
+              "type": "varchar(200)",
+              "description": "Physical address of the BPKP office."
+            },
+            "postal_code": {
+              "type": "varchar(12)",
+              "description": "Postal code associated with the BPKP office location."
+            },
+            "city": {
+              "type": "integer",
+              "foreign_key": "ref.cities.id",
+              "description": "Reference to the city where the BPKP office is located."
+            },
+            "province": {
+              "type": "integer",
+              "foreign_key": "ref.provinces.id",
+              "description": "Reference to the province where the BPKP office is located."
+            },
+            "country": {
+              "type": "integer",
+              "foreign_key": "ref.countries.id",
+              "description": "Reference to the country where the BPKP office is located, typically Indonesia."
+            }
+          }
+        },
+        "kpi_categories": {
+          "description": "Contains categories for Key Performance Indicators (KPIs) used to evaluate BPKP employee performance.",
+          "columns": {
+            "id": {
+              "type": "serial",
+              "primary_key": true,
+              "description": "Unique identifier for each KPI category."
+            },
+            "name": {
+              "type": "varchar(100)",
+              "unique": true,
+              "description": "Name of the KPI category (e.g., Audit Performance, Compliance Rate)."
+            },
+            "description": {
+              "type": "text",
+              "description": "Detailed description of the KPI category."
+            },
+            "unit": {
+              "type": "varchar(50)",
+              "description": "Measurement unit for the KPI (e.g., percentage, reports)."
+            },
+            "created_on": {
+              "type": "timestamp",
+              "default": "CURRENT_TIMESTAMP",
+              "description": "Timestamp when the KPI category was created."
+            },
+            "updated_on": {
+              "type": "timestamp",
+              "description": "Timestamp when the KPI category was last updated."
+            }
+          }
+        },
+        "regulation_categories": {
+          "description": "Categorizes different regulations within BPKP's governance framework.",
+          "columns": {
+            "id": {
+              "type": "serial",
+              "primary_key": true,
+              "description": "Unique identifier for each regulation category."
+            },
+            "name": {
+              "type": "varchar(100)",
+              "description": "Name of the regulation category (e.g., Financial, Operational)."
+            },
+            "created_on": {
+              "type": "timestamp",
+              "default": "CURRENT_TIMESTAMP",
+              "description": "Timestamp when the regulation category was created."
+            },
+            "updated_on": {
+              "type": "timestamp",
+              "description": "Timestamp when the regulation category was last updated."
+            },
+            "is_active": {
+              "type": "integer",
+              "default": 1,
+              "description": "Status of the category (1: Active, 0: Inactive)."
+            }
+          }
+        },
+        "leave_types": {
+          "description": "Defines types of employee leave policies within BPKP (e.g., annual leave, sick leave).",
+          "columns": {
+            "id": {
+              "type": "serial",
+              "primary_key": true,
+              "description": "Unique identifier for each leave type."
+            },
+            "name": {
+              "type": "varchar(50)",
+              "description": "Name of the leave type (e.g., Annual Leave, Medical Leave)."
+            },
+            "max_days": {
+              "type": "integer",
+              "description": "Maximum allowable days for this leave type per cycle."
+            },
+            "cycle": {
+              "type": "varchar(20)",
+              "description": "The cycle period for leave (e.g., yearly, monthly)."
+            }
+          }
+        },
+        "regulations": {
+          "description": "Contains records of official BPKP regulations and policies, including their status and document storage information.",
+          "columns": {
+            "id": {
+              "type": "serial",
+              "primary_key": true,
+              "description": "Unique identifier for each regulation."
+            },
+            "category": {
+              "type": "integer",
+              "foreign_key": "ref.regulation_categories.id",
+              "description": "Reference to the category that classifies this regulation."
+            },
+            "name": {
+              "type": "text",
+              "description": "Title or official name of the regulation."
+            },
+            "description": {
+              "type": "text",
+              "description": "Detailed description or summary of the regulation."
+            },
+            "created_on": {
+              "type": "timestamp",
+              "default": "CURRENT_TIMESTAMP",
+              "description": "Timestamp when the regulation record was created."
+            },
+            "updated_on": {
+              "type": "timestamp",
+              "description": "Timestamp when the regulation record was last updated."
+            },
+            "status": {
+              "type": "integer",
+              "description": "Status of the regulation (1: valid, 2: invalid)."
+            },
+            "file_path": {
+              "type": "text",
+              "description": "Path to the regulation document stored on the system."
+            },
+            "text": {
+              "type": "text",
+              "description": "Full text content of the regulation, if applicable."
+            }
+          }
+        }
+      }
+    },
+    "hr": {
+      "description": "Human resources-related tables specific to managing BPKP employees, their organizational structure, attendance, leaves, and performance records.",
+      "tables": {
+        "employees": {
+          "description": "Contains detailed information about BPKP employees, including personal data, job details, and organizational structure.",
+          "columns": {
+            "id": {
+              "type": "serial",
+              "primary_key": true,
+              "description": "Unique identifier for each employee."
+            },
+            "id_number": {
+              "type": "varchar(18)",
+              "description": "Employee's unique identification number (NIP or equivalent for BPKP)."
+            },
+            "first_name": {
+              "type": "varchar(50)",
+              "description": "Employee's first name."
+            },
+            "last_name": {
+              "type": "varchar(50)",
+              "description": "Employee's last name."
+            },
+            "citizen_number": {
+              "type": "varchar(16)",
+              "description": "National identification number (NIK)."
+            },
+            "birth_place": {
+              "type": "varchar(50)",
+              "description": "City or region where the employee was born."
+            },
+            "birth_date": {
+              "type": "date",
+              "description": "Employee's date of birth."
+            },
+            "address": {
+              "type": "varchar(200)",
+              "description": "Employee's residential address."
+            },
+            "email": {
+              "type": "varchar(50)",
+              "description": "Official email address of the employee."
+            },
+            "phone_number": {
+              "type": "varchar(20)",
+              "description": "Contact phone number for the employee."
+            },
+            "tax_number": {
+              "type": "varchar(20)",
+              "description": "Taxpayer Identification Number (NPWP) for the employee."
+            },
+            "hire_date": {
+              "type": "date",
+              "description": "The date when the employee joined BPKP."
+            },
+            "resignation_date": {
+              "type": "date",
+              "description": "Date when the employee left BPKP (if applicable)."
+            },
+            "rank": {
+              "type": "integer",
+              "foreign_key": "ref.ranks.id",
+              "description": "Reference to the employee's official rank."
+            },
+            "job": {
+              "type": "integer",
+              "foreign_key": "hr.jobs.id",
+              "description": "Reference to the employee's job title and responsibilities."
+            },
+            "unit": {
+              "type": "integer",
+              "foreign_key": "hr.units.id",
+              "description": "Reference to the organizational unit where the employee is assigned."
+            },
+            "manager": {
+              "type": "integer",
+              "foreign_key": "hr.employees.id",
+              "description": "Reference to the employee's direct supervisor or manager."
+            },
+            "salary": {
+              "type": "integer",
+              "default": 0,
+              "description": "The employee's monthly salary in Indonesian Rupiah (IDR)."
+            },
+            "sex": {
+              "type": "integer",
+              "description": "Employee's gender (1: Male, 2: Female)."
+            },
+            "created_on": {
+              "type": "timestamp",
+              "default": "CURRENT_TIMESTAMP",
+              "description": "Timestamp when the employee record was created."
+            },
+            "updated_on": {
+              "type": "timestamp",
+              "description": "Timestamp when the employee record was last updated."
+            }
+          }
+        },
+        "jobs": {
+          "description": "Defines job titles, their corresponding echelon levels, and rank requirements within BPKP.",
+          "columns": {
+            "id": {
+              "type": "integer",
+              "primary_key": true,
+              "description": "Unique identifier for each job title."
+            },
+            "title": {
+              "type": "varchar(100)",
+              "description": "Job title or official position name (e.g., Auditor, Senior Analyst)."
+            },
+            "echelon": {
+              "type": "integer",
+              "foreign_key": "ref.echelons.id",
+              "description": "Reference to the echelon level required for the job."
+            },
+            "rank": {
+              "type": "integer",
+              "foreign_key": "ref.ranks.id",
+              "description": "Reference to the rank required for this job."
+            },
+            "min_salary": {
+              "type": "integer",
+              "description": "Minimum salary for the job position in Indonesian Rupiah (IDR)."
+            },
+            "max_salary": {
+              "type": "integer",
+              "description": "Maximum salary for the job position in Indonesian Rupiah (IDR)."
+            },
+            "created_on": {
+              "type": "timestamp",
+              "default": "CURRENT_TIMESTAMP",
+              "description": "Timestamp when the job record was created."
+            },
+            "updated_on": {
+              "type": "timestamp",
+              "description": "Timestamp when the job record was last updated."
+            }
+          }
+        },
+        "units": {
+          "description": "Describes BPKP's organizational structure by defining units, their hierarchy, and associated office locations.",
+          "columns": {
+            "id": {
+              "type": "serial",
+              "primary_key": true,
+              "description": "Unique identifier for each organizational unit."
+            },
+            "name": {
+              "type": "varchar(100)",
+              "description": "Name of the organizational unit (e.g., Directorate of Audit, IT Department)."
+            },
+            "echelon": {
+              "type": "integer",
+              "foreign_key": "ref.echelons.id",
+              "description": "Reference to the echelon level this unit falls under."
+            },
+            "office": {
+              "type": "integer",
+              "foreign_key": "ref.offices.id",
+              "description": "Reference to the physical office where the unit is located."
+            },
+            "managing_unit": {
+              "type": "integer",
+              "foreign_key": "hr.units.id",
+              "description": "Reference to the parent or managing unit (for hierarchical structure)."
+            },
+            "head": {
+              "type": "integer",
+              "foreign_key": "hr.employees.id",
+              "description": "Reference to the employee who leads the unit."
+            },
+            "created_on": {
+              "type": "timestamp",
+              "default": "CURRENT_TIMESTAMP",
+              "description": "Timestamp when the unit record was created."
+            },
+            "updated_on": {
+              "type": "integer",
+              "description": "Timestamp when the unit record was last updated."
+            }
+          }
+        },
+        "attendance": {
+          "description": "Records the attendance of BPKP employees, including check-in, check-out, and work status.",
+          "columns": {
+            "id": {
+              "type": "serial",
+              "primary_key": true,
+              "description": "Unique identifier for each attendance record."
+            },
+            "employee": {
+              "type": "integer",
+              "foreign_key": "hr.employees.id",
+              "description": "Reference to the employee who the record belongs to."
+            },
+            "date": {
+              "type": "date",
+              "description": "Date of the attendance record."
+            },
+            "check_in": {
+              "type": "time",
+              "description": "Time when the employee checked in."
+            },
+            "check_out": {
+              "type": "time",
+              "description": "Time when the employee checked out."
+            },
+            "status": {
+              "type": "integer",
+              "description": "Attendance status (0: absent, 1: present, 2: late, 3: leave, 4: remote, 5: business trip)."
+            },
+            "work_hours": {
+              "type": "interval",
+              "generated": "check_out - check_in",
+              "description": "Automatically calculated work duration for the day."
+            },
+            "remarks": {
+              "type": "text",
+              "description": "Additional remarks or comments regarding the attendance."
+            },
+            "created_on": {
+              "type": "timestamp",
+              "default": "CURRENT_TIMESTAMP",
+              "description": "Timestamp when the attendance record was created."
+            },
+            "updated_on": {
+              "type": "timestamp",
+              "description": "Timestamp when the attendance record was last updated."
+            },
+            "leave_type": {
+              "type": "integer",
+              "foreign_key": "ref.leave_types.id",
+              "description": "Reference to the type of leave, if applicable."
+            }
+          }
+        },
+        "leaves": {
+          "description": "Records employee leave requests and their approval status.",
+          "columns": {
+            "id": {
+              "type": "bigserial",
+              "primary_key": true,
+              "description": "Unique identifier for each leave record."
+            },
+            "employee": {
+              "type": "integer",
+              "foreign_key": "hr.employees.id",
+              "description": "Reference to the employee requesting leave."
+            },
+            "leave_type": {
+              "type": "integer",
+              "foreign_key": "ref.leave_types.id",
+              "description": "Reference to the type of leave."
+            },
+            "start_date": {
+              "type": "date",
+              "description": "Start date of the leave."
+            },
+            "end_date": {
+              "type": "date",
+              "description": "End date of the leave."
+            },
+            "total_days": {
+              "type": "serial",
+              "description": "Total number of leave days requested."
+            },
+            "paid": {
+              "type": "integer",
+              "description": "Payment status (1: paid, 2: partial, 3: unpaid)."
+            },
+            "status": {
+              "type": "integer",
+              "description": "Approval status (1: approved, 2: rejected, 3: pending)."
+            },
+            "approved_by": {
+              "type": "integer",
+              "foreign_key": "hr.employees.id",
+              "description": "Reference to the employee who approved the leave."
+            },
+            "created_on": {
+              "type": "timestamp",
+              "default": "CURRENT_TIMESTAMP",
+              "description": "Timestamp when the leave request was created."
+            },
+            "updated_on": {
+              "type": "timestamp",
+              "description": "Timestamp when the leave request was last updated."
+            }
+          }
+        },
+        "leave_entitlements": {
+          "description": "Tracks leave balances and entitlements for BPKP employees.",
+          "columns": {
+            "id": {
+              "type": "serial",
+              "primary_key": true,
+              "description": "Unique identifier for each leave entitlement."
+            },
+            "year": {
+              "type": "varchar(4)",
+              "description": "The year for which the entitlement is valid."
+            },
+            "employee": {
+              "type": "integer",
+              "foreign_key": "hr.employees.id",
+              "description": "Reference to the employee receiving the entitlement."
+            },
+            "leave_type": {
+              "type": "integer",
+              "foreign_key": "ref.leave_types.id",
+              "description": "Reference to the leave type."
+            },
+            "entitlement": {
+              "type": "integer",
+              "description": "Total number of leave days entitled."
+            },
+            "used": {
+              "type": "integer",
+              "description": "Number of leave days already used."
+            },
+            "remaining": {
+              "type": "integer",
+              "generated": "entitlement - used",
+              "description": "Automatically calculated remaining leave days."
+            },
+            "valid_fr": {
+              "type": "date",
+              "description": "Start date of the entitlement validity."
+            },
+            "valid_thru": {
+              "type": "date",
+              "description": "End date of the entitlement validity."
+            },
+            "status": {
+              "type": "integer",
+              "description": "Entitlement status (1: Active, 2: Pending, 3: Expired, 4: Depleted, 5: Exceeded)."
+            },
+            "description": {
+              "type": "varchar(100)",
+              "description": "Additional details about the entitlement."
+            },
+            "created_on": {
+              "type": "timestamp",
+              "default": "CURRENT_TIMESTAMP",
+              "description": "Timestamp when the entitlement was created."
+            },
+            "updated_on": {
+              "type": "timestamp",
+              "description": "Timestamp when the entitlement was last updated."
+            }
+          }
+        },
+        "kpi": {
+          "description": "Records and monitors employee performance using Key Performance Indicators (KPIs).",
+          "columns": {
+            "id": {
+              "type": "serial",
+              "primary_key": true,
+              "description": "Unique identifier for each KPI record."
+            },
+            "employee": {
+              "type": "integer",
+              "foreign_key": "hr.employees.id",
+              "description": "Reference to the employee whose performance is being tracked."
+            },
+            "category": {
+              "type": "integer",
+              "foreign_key": "ref.kpi_categories.id",
+              "description": "Reference to the KPI category."
+            },
+            "target_value": {
+              "type": "numeric(10,2)",
+              "description": "The target value set for the KPI."
+            },
+            "achieved_value": {
+              "type": "numeric(10,2)",
+              "description": "The value achieved by the employee."
+            },
+            "performance": {
+              "type": "numeric(5,2)",
+              "generated": "CASE WHEN achieved_value >= target_value THEN 100.00 ELSE (achieved_value / target_value) * 100 END",
+              "description": "Calculated performance percentage."
+            }
+          }
+        },
+        "dependents": {
+          "description": "Records information about employees' dependents (e.g., spouse, children) within BPKP.",
+          "columns": {
+            "id": {
+              "type": "serial",
+              "primary_key": true,
+              "description": "Unique identifier for each dependent."
+            },
+            "first_name": {
+              "type": "varchar(50)",
+              "description": "Dependent's first name."
+            },
+            "last_name": {
+              "type": "varchar(50)",
+              "description": "Dependent's last name."
+            },
+            "relationship": {
+              "type": "varchar(25)",
+              "description": "The relationship between the dependent and the employee (e.g., spouse, child)."
+            },
+            "employee": {
+              "type": "integer",
+              "foreign_key": "hr.employees.id",
+              "description": "Reference to the employee to whom the dependent belongs."
+            },
+            "created_on": {
+              "type": "timestamp",
+              "default": "CURRENT_TIMESTAMP",
+              "description": "Timestamp when the dependent record was created."
+            },
+            "updated_on": {
+              "type": "timestamp",
+              "description": "Timestamp when the dependent record was last updated."
+            }
+          }
+        },
+        "sp": {
+          "description": "Records disciplinary actions (Surat Peringatan) issued to employees within BPKP.",
+          "columns": {
+            "id": {
+              "type": "bigserial",
+              "primary_key": true,
+              "description": "Unique identifier for each disciplinary record."
+            },
+            "sp_type": {
+              "type": "integer",
+              "description": "Type of disciplinary action (e.g., 1: Verbal Warning, 2: Written Warning)."
+            },
+            "employee": {
+              "type": "integer",
+              "foreign_key": "hr.employees.id",
+              "description": "Reference to the employee receiving the disciplinary action."
+            },
+            "valid_fr": {
+              "type": "date",
+              "description": "Start date of the disciplinary action validity."
+            },
+            "valid_thru": {
+              "type": "date",
+              "description": "End date of the disciplinary action validity."
+            },
+            "file": {
+              "type": "text",
+              "description": "Path to the stored document of the disciplinary letter."
+            },
+            "description": {
+              "type": "text",
+              "description": "Details or explanation about the disciplinary action."
+            },
+            "created_on": {
+              "type": "timestamp",
+              "default": "CURRENT_TIMESTAMP",
+              "description": "Timestamp when the disciplinary action was created."
+            },
+            "updated_on": {
+              "type": "timestamp",
+              "description": "Timestamp when the disciplinary action was last updated."
+            }
+          }
+        }
+      },
+      "views": {
+        "v_employee_leave_details": {
+    "description": "Provides details about employee leaves, including entitlement and usage.",
+    "columns": {
+      "id": {
+        "type": "integer",
+        "description": "Employee ID."
+      },
+      "first_name": {
+        "type": "varchar(50)",
+        "description": "Employee's first name."
+      },
+      "last_name": {
+        "type": "varchar(50)",
+        "description": "Employee's last name."
+      },
+      "id_number": {
+        "type": "varchar(18)",
+        "description": "Employee's unique identification number (NIP)."
+      },
+      "year": {
+        "type": "varchar(4)",
+        "description": "Year for which the entitlement is valid."
+      },
+      "start_date": {
+        "type": "date",
+        "description": "Start date of the leave entitlement."
+      },
+      "end_date": {
+        "type": "date",
+        "description": "End date of the leave entitlement."
+      },
+      "total_days": {
+        "type": "integer",
+        "description": "Total leave entitlement days."
+      },
+      "used": {
+        "type": "integer",
+        "description": "Total leave days already used."
+      },
+      "remaining": {
+        "type": "integer",
+        "description": "Leave days remaining for the employee."
+      },
+      "leave_type": {
+        "type": "varchar(50)",
+        "description": "Type of leave (e.g., Annual, Medical)."
+      },
+      "description": {
+        "type": "varchar(100)",
+        "description": "Additional details or notes about the leave."
+      }
+    }
+  },
+        "v_today_attendance": {
+    "description": "Summarizes the attendance of all employees for the current day.",
+    "columns": {
+      "status": {
+        "type": "integer",
+        "description": "Attendance status (e.g., 0: Absent, 1: Present, 2: Late, etc.)."
+      },
+      "label": {
+        "type": "text",
+        "description": "Human-readable label for the status (e.g., 'Present', 'Absent')."
+      },
+      "percentage": {
+        "type": "numeric",
+        "description": "Percentage of employees in this attendance category."
+      },
+      "count": {
+        "type": "integer",
+        "description": "Total number of employees in this attendance category."
+      },
+      "total_employee": {
+        "type": "integer",
+        "description": "Total number of employees being tracked."
+      }
+    }
+  },
+          "v_employee_late_counter": {
+    "description": "Tracks how many times each employee was late, aggregated by month and year.",
+    "columns": {
+      "employee_id": {
+        "type": "integer",
+        "description": "Employee ID."
+      },
+      "first_name": {
+        "type": "varchar(50)",
+        "description": "Employee's first name."
+      },
+      "last_name": {
+        "type": "varchar(50)",
+        "description": "Employee's last name."
+      },
+      "job": {
+        "type": "integer",
+        "description": "Reference to the employee's job."
+      },
+      "unit": {
+        "type": "integer",
+        "description": "Reference to the employee's organizational unit."
+      },
+      "unit_name": {
+        "type": "varchar(100)",
+        "description": "Name of the organizational unit."
+      },
+      "year": {
+        "type": "integer",
+        "description": "Year of the late attendance."
+      },
+      "month": {
+        "type": "integer",
+        "description": "Month of the late attendance."
+      },
+      "late_count": {
+        "type": "integer",
+        "description": "Number of times the employee was late."
+      }
+    }
+  },
+    "v_employee_leaves_remaining": {
+    "description": "Displays remaining leave balances for each employee across different leave types.",
+    "columns": {
+      "id": {
+        "type": "integer",
+        "description": "Employee ID."
+      },
+      "first_name": {
+        "type": "varchar(50)",
+        "description": "Employee's first name."
+      },
+      "last_name": {
+        "type": "varchar(50)",
+        "description": "Employee's last name."
+      },
+      "year": {
+        "type": "varchar(4)",
+        "description": "Leave entitlement year."
+      },
+      "leave_type_id": {
+        "type": "integer",
+        "description": "ID of the leave type."
+      },
+      "leave_type": {
+        "type": "varchar(50)",
+        "description": "Name of the leave type."
+      },
+      "total_entitlement": {
+        "type": "integer",
+        "description": "Total entitled leave days."
+      },
+      "total_used": {
+        "type": "integer",
+        "description": "Leave days used."
+      },
+      "total_remaining": {
+        "type": "integer",
+        "description": "Leave days remaining."
+      }
+    }
+  },
+    "v_employee_dependents": {
+    "description": "Displays detailed information about employees and their dependents within BPKP.",
+    "columns": {
+      "dependent_id": {
+        "type": "integer",
+        "description": "Unique identifier for each dependent."
+      },
+      "dependent_first_name": {
+        "type": "varchar(50)",
+        "description": "First name of the dependent."
+      },
+      "dependent_last_name": {
+        "type": "varchar(50)",
+        "description": "Last name of the dependent."
+      },
+      "relationship": {
+        "type": "varchar(25)",
+        "description": "Relationship of the dependent to the employee (e.g., spouse, child)."
+      },
+      "dependent_created_on": {
+        "type": "timestamp",
+        "description": "Timestamp when the dependent record was created."
+      },
+      "employee_id": {
+        "type": "integer",
+        "description": "Unique identifier of the employee."
+      },
+      "id_number": {
+        "type": "varchar(18)",
+        "description": "Employee's unique identification number (NIP)."
+      },
+      "employee_first_name": {
+        "type": "varchar(50)",
+        "description": "Employee's first name."
+      },
+      "employee_last_name": {
+        "type": "varchar(50)",
+        "description": "Employee's last name."
+      },
+      "citizen_number": {
+        "type": "varchar(16)",
+        "description": "Employee's national identification number (NIK)."
+      },
+      "birth_place": {
+        "type": "varchar(50)",
+        "description": "Place where the employee was born."
+      },
+      "birth_date": {
+        "type": "date",
+        "description": "Employee's date of birth."
+      },
+      "employee_address": {
+        "type": "varchar(200)",
+        "description": "Employee's residential address."
+      },
+      "email": {
+        "type": "varchar(50)",
+        "description": "Employee's official email address."
+      },
+      "phone_number": {
+        "type": "varchar(20)",
+        "description": "Employee's contact phone number."
+      },
+      "tax_number": {
+        "type": "varchar(20)",
+        "description": "Employee's taxpayer identification number (NPWP)."
+      },
+      "hire_date": {
+        "type": "date",
+        "description": "Date when the employee joined BPKP."
+      },
+      "resignation_date": {
+        "type": "date",
+        "description": "Date when the employee left BPKP (if applicable)."
+      },
+      "salary": {
+        "type": "integer",
+        "description": "Employee's monthly salary in Indonesian Rupiah (IDR)."
+      },
+      "sex": {
+        "type": "text",
+        "description": "Employee's gender (Male or Female)."
+      },
+      "employee_created_on": {
+        "type": "timestamp",
+        "description": "Timestamp when the employee record was created."
+      },
+      "manager_first_name": {
+        "type": "varchar(50)",
+        "description": "First name of the employee's manager."
+      },
+      "manager_last_name": {
+        "type": "varchar(50)",
+        "description": "Last name of the employee's manager."
+      },
+      "job_title": {
+        "type": "varchar(100)",
+        "description": "Title of the employee's job."
+      },
+      "rank_name": {
+        "type": "varchar(50)",
+        "description": "Name of the employee's rank."
+      },
+      "rank_code": {
+        "type": "varchar(5)",
+        "description": "Code representing the employee's rank."
+      },
+      "rank_min_salary": {
+        "type": "integer",
+        "description": "Minimum salary associated with the rank."
+      },
+      "rank_max_salary": {
+        "type": "integer",
+        "description": "Maximum salary associated with the rank."
+      },
+      "echelon_name": {
+        "type": "varchar(50)",
+        "description": "Name of the echelon level the employee belongs to."
+      },
+      "echelon_code": {
+        "type": "varchar(5)",
+        "description": "Code representing the echelon level."
+      },
+      "echelon_min_salary": {
+        "type": "integer",
+        "description": "Minimum salary associated with the echelon."
+      },
+      "echelon_max_salary": {
+        "type": "integer",
+        "description": "Maximum salary associated with the echelon."
+      },
+      "unit_name": {
+        "type": "varchar(100)",
+        "description": "Name of the organizational unit where the employee works."
+      },
+      "office_name": {
+        "type": "varchar(100)",
+        "description": "Name of the BPKP office where the employee is located."
+      },
+      "office_address": {
+        "type": "varchar(200)",
+        "description": "Physical address of the BPKP office."
+      },
+      "postal_code": {
+        "type": "varchar(12)",
+        "description": "Postal code of the BPKP office."
+      },
+      "city_name": {
+        "type": "varchar(50)",
+        "description": "Name of the city where the BPKP office is located."
+      },
+      "province_name": {
+        "type": "varchar(50)",
+        "description": "Name of the province where the BPKP office is located."
+      },
+      "country_name": {
+        "type": "varchar(40)",
+        "description": "Name of the country where the BPKP office is located (typically Indonesia)."
+      },
+      "country_code": {
+        "type": "varchar(2)",
+        "description": "ISO country code (e.g., 'ID' for Indonesia)."
+      }
+    }
+  },
+    "v_employee_profiles": {
+    "description": "Provides a comprehensive profile of BPKP employees, including job information, organizational structure, and location.",
+    "columns": {
+      "employee_id": {
+        "type": "integer",
+        "description": "Unique identifier of the employee."
+      },
+      "id_number": {
+        "type": "varchar(18)",
+        "description": "Employee's unique identification number (NIP)."
+      },
+      "employee_first_name": {
+        "type": "varchar(50)",
+        "description": "Employee's first name."
+      },
+      "employee_last_name": {
+        "type": "varchar(50)",
+        "description": "Employee's last name."
+      },
+      "citizen_number": {
+        "type": "varchar(16)",
+        "description": "Employee's national identification number (NIK)."
+      },
+      "birth_place": {
+        "type": "varchar(50)",
+        "description": "Place where the employee was born."
+      },
+      "birth_date": {
+        "type": "date",
+        "description": "Employee's date of birth."
+      },
+      "employee_address": {
+        "type": "varchar(200)",
+        "description": "Employee's residential address."
+      },
+      "email": {
+        "type": "varchar(50)",
+        "description": "Employee's official email address."
+      },
+      "phone_number": {
+        "type": "varchar(20)",
+        "description": "Employee's contact phone number."
+      },
+      "hire_date": {
+        "type": "date",
+        "description": "Date when the employee joined BPKP."
+      },
+      "salary": {
+        "type": "integer",
+        "description": "Employee's monthly salary in Indonesian Rupiah (IDR)."
+      },
+      "sex": {
+        "type": "text",
+        "description": "Employee's gender (Male or Female)."
+      },
+      "job_title": {
+        "type": "varchar(100)",
+        "description": "Title of the employee's job."
+      },
+      "unit_name": {
+        "type": "varchar(100)",
+        "description": "Name of the organizational unit where the employee works."
+      },
+      "office_name": {
+        "type": "varchar(100)",
+        "description": "Name of the BPKP office where the employee is located."
+      },
+      "city_name": {
+        "type": "varchar(50)",
+        "description": "City of the employee's office location."
+      }
+    }
+  }
+      }
+    }
+  }
+}
